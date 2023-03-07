@@ -7,6 +7,7 @@ stages:
   - test
   - deploy
   - post deploy
+  - publishing
 
 build:
   stage: build
@@ -76,10 +77,19 @@ api testing:
     entrypoint: [""]
   script:
     - newman --version
-    - newman run "Cars API.postman_collection.json" --environment Production.postman_environment --reporters cli, htmlextra, junit --reporter-htmlextra-export "newman/report.html" --reporter-junit-export "newman/report.xml"
+    - newman run "Cars API.postman_collection.json" --environment Production.postman_environment.json --reporters cli,htmlextra,junit --reporter-htmlextra-export "newman/report.html" --reporter-junit-export "newman/report.xml"
   artifacts:
     when: always
     paths:
       - newman/
     reports:
       junit: newman/report.xml
+
+pages:
+  stage: publishing
+  script:
+    - mkdir public
+    - mv newman/report.html public/index.html
+  artifacts:
+    paths:
+      - public
